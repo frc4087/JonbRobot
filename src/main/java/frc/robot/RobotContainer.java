@@ -130,8 +130,8 @@ public class RobotContainer {
 		chooser.addOption("TurnDuration (" + targetSec + "s)",
 				new TurnDuration(_diffDrive, targetFac, targetSec));
 
-		SmartDashboard.putData(chooser);
-		////SmartDashboard.putData("Auto Mode: Auto Commands", chooser);
+		////SmartDashboard.putData(chooser);
+		SmartDashboard.putData("Auto Mode Commands", chooser);
 		return chooser;
 	}
 
@@ -147,7 +147,7 @@ public class RobotContainer {
 
 		SendableChooser<Command> chooser = new SendableChooser<>();
 
-		chooser.addOption("Quasistatis, Forward",
+		chooser.setDefaultOption("Quasistatis, Forward",
 				sysidFactory.quasistatic(Direction.kForward));
 		chooser.addOption("Quasistatis, Reverse",
 				sysidFactory.quasistatic(Direction.kReverse));
@@ -156,8 +156,8 @@ public class RobotContainer {
 		chooser.addOption("Dynamic, Reverse",
 				sysidFactory.dynamic(Direction.kReverse));
 
-		SmartDashboard.putData(chooser);
-		////SmartDashboard.putData("Test Mode: Sysid Commands)", chooser);
+		////SmartDashboard.putData(chooser);
+		SmartDashboard.putData("Test Mode Commands", chooser);
 		return chooser;
 	}
 	private final DiffDriveSubsystem _diffDrive;
