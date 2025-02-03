@@ -7,7 +7,6 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.RobotContainer.RobotType;
 
 /**
  * The methods in this class are called automatically corresponding to each
@@ -18,6 +17,7 @@ import frc.robot.RobotContainer.RobotType;
  */
 public class Robot extends TimedRobot {
 	private final RobotContainer m_robotContainer;
+	private final RobotTelemetry m_robotTelemetry;
 
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -25,10 +25,14 @@ public class Robot extends TimedRobot {
 	 * initialization code.
 	 */
 	public Robot() {
-		// Instantiate our RobotContainer. This will perform all our button
-		// bindings, and put our
-		// autonomous chooser on the dashboard.
-		m_robotContainer = new RobotContainer(RobotType.XRP);
+		RobotType type = RobotType.XRP;
+		m_robotContainer = new RobotContainer(type);
+		m_robotTelemetry = new RobotTelemetry(type);
+	}
+
+	@Override
+	public void robotInit() {
+		m_robotTelemetry.telemetryInit();
 	}
 
 	/**
@@ -50,6 +54,7 @@ public class Robot extends TimedRobot {
 		// the robot's periodic
 		// block in order for anything in the Command-based framework to work.
 		CommandScheduler.getInstance().run();
+		m_robotTelemetry.telemetryPeriodic();
 	}
 
 	@Override
@@ -65,7 +70,7 @@ public class Robot extends TimedRobot {
 		CommandScheduler.getInstance().cancelAll();
 
 		Command command = m_robotContainer.getAutonomousCommand();
-		if(command != null) {
+		if (command != null) {
 			command.schedule();
 		}
 	}
@@ -98,4 +103,13 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void testPeriodic() {}
+
+	// class
+
+	/**
+	 * Specifies the specific technology base used for the robot.
+	 */
+	public static enum RobotType {
+		ROMI, XRP, SWERVE;
+	}
 }

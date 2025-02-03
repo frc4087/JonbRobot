@@ -149,7 +149,8 @@ public class XrpDriveSubsystem extends SubsystemBase
 
 	@Override
 	public Rotation2d getRotationZ() {
-		return Rotation2d.fromDegrees(-_gyro.getAngleZ());
+		// XRP is normal
+		return Rotation2d.fromDegrees(_gyro.getAngleZ());
 	}
 
 	@Override

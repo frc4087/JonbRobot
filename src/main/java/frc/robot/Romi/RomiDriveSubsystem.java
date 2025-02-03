@@ -144,6 +144,7 @@ public class RomiDriveSubsystem extends SubsystemBase
 
 	@Override
 	public Rotation2d getRotationZ() {
+		// Romi is inverted
 		return Rotation2d.fromDegrees(-_gyro.getAngleZ());
 	}
 

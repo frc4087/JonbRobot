@@ -39,6 +39,7 @@ public class TurnAngle extends Command {
 	public void initialize() {
 		_drive.arcadeDrive(0, 0);
 		_drive.resetPose(Pose2d.kZero);
+		_continuous.reset();
 	}
 
 	@Override

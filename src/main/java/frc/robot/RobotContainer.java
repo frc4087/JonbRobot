@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.jonb.pathplanner.PPBridge;
 import frc.jonb.subsystems.DiffDriveSubsystem;
 import frc.jonb.sysid.SysIdDrivable;
+import frc.robot.Robot.RobotType;
 import frc.robot.Romi.RomiRobot;
 import frc.robot.Xrp.XrpRobot;
 import frc.robot.commands.ArcadeDrive;
@@ -27,17 +28,21 @@ import frc.robot.commands.TurnDuration;
 
 /**
  * Build and configures the guts (subsystems) and brain (logic) of the robot.
+ * User control is via dashboard choosers and a joystick.
+ * <ul>
+ * <li>Auto Mode Commands: The command executed each time Autonomous mode is
+ * enabled.
+ * <li>Test Mode Commands: The command executed each time Test mode is
+ * enabled. To generate a SysId log, must run each of the four SysId commands to
+ * completion.
+ * </ul>
  */
 public class RobotContainer {
 	/**
-	 * Specifies the specific technology base used for the robot.
-	 */
-	public static enum RobotType {
-		ROMI, XRP, SWERVE;
-	}
-
-	/**
 	 * Creates an instance.
+	 * 
+	 * @param type
+	 *            Robot type.
 	 */
 	public RobotContainer(RobotType type) {
 		// build robot guts
@@ -45,7 +50,8 @@ public class RobotContainer {
 			case ROMI:
 				RomiRobot romiRobot = new RomiRobot();
 				_sysidDrive = romiRobot.getSysidDrivetrain();
-				_diffDrive = new DiffDriveSubsystem(romiRobot.getRawDrivetrain());
+				_diffDrive = new DiffDriveSubsystem(
+						romiRobot.getRawDrivetrain());
 				break;
 			case SWERVE:
 				throw new IllegalStateException(
@@ -100,7 +106,8 @@ public class RobotContainer {
 	// personal
 
 	/**
-	 * Builds the SmartDashboard chooser for Auto mode. MUST first build PPBridge.
+	 * Builds the SmartDashboard chooser for Auto mode. MUST first build
+	 * PPBridge.
 	 */
 	protected SendableChooser<Command> buildAutoChooser() {
 		SendableChooser<Command> chooser = new SendableChooser<>();
@@ -130,7 +137,7 @@ public class RobotContainer {
 		chooser.addOption("TurnDuration (" + targetSec + "s)",
 				new TurnDuration(_diffDrive, targetFac, targetSec));
 
-		////SmartDashboard.putData(chooser);
+		//// SmartDashboard.putData(chooser);
 		SmartDashboard.putData("Auto Mode Commands", chooser);
 		return chooser;
 	}
@@ -139,27 +146,28 @@ public class RobotContainer {
 	 * Builds the SmartDashboard chooser for Test mode.
 	 */
 	protected SendableChooser<Command> buildTestChooser() {
-				SysIdRoutine sysidFactory = new SysIdRoutine(new SysIdRoutine.Config(),
+		SysIdRoutine sysidFactory = new SysIdRoutine(new SysIdRoutine.Config(),
 				new SysIdRoutine.Mechanism(
-								_sysidDrive::setVoltage, 
-								_sysidDrive::logEntry,
-								_sysidDrive));
+						_sysidDrive::setVoltage,
+						_sysidDrive::logEntry,
+						_sysidDrive));
 
 		SendableChooser<Command> chooser = new SendableChooser<>();
 
-		chooser.setDefaultOption("Quasistatis, Forward",
+		chooser.setDefaultOption("Quasistatic, Forward",
 				sysidFactory.quasistatic(Direction.kForward));
-		chooser.addOption("Quasistatis, Reverse",
+		chooser.addOption("Quasistatic, Reverse",
 				sysidFactory.quasistatic(Direction.kReverse));
 		chooser.addOption("Dynamic, Forward",
 				sysidFactory.dynamic(Direction.kForward));
 		chooser.addOption("Dynamic, Reverse",
 				sysidFactory.dynamic(Direction.kReverse));
 
-		////SmartDashboard.putData(chooser);
+		//// SmartDashboard.putData(chooser);
 		SmartDashboard.putData("Test Mode Commands", chooser);
 		return chooser;
 	}
+
 	private final DiffDriveSubsystem _diffDrive;
 	private final SysIdDrivable _sysidDrive;
 	private final SendableChooser<Command> _autoChooser;

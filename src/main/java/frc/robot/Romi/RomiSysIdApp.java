@@ -1,8 +1,7 @@
-package frc.robot;
+package frc.robot.Romi;
 
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.jonb.sysid.SysIdRobot;
-import frc.robot.Romi.RomiDriveSubsystem;
 
 public class RomiSysIdApp {
 	public static void main(String... args) {
