@@ -91,7 +91,7 @@ public class RobotContainer {
 	 * @return The command. None if null.
 	 */
 	public Command getTeleopCommand() {
-		return new ArcadeDrive(_diffDrive, _stick::getX, _stick::getY);
+		return new ArcadeDrive(_diffDrive, _stick::getY, _stick::getX);
 	}
 
 	/**
