@@ -40,7 +40,6 @@ public class PPBridge<T extends PPDrivable> {
 		// build PP controller
 		double allQ = 0.03;
 		double allR = 0.05;
-		////PPLTVController controller = new PPLTVController(0.02, 1.0);
 		PPLTVController controller = new PPLTVController(
 		VecBuilder.fill(allQ, allQ, allQ), VecBuilder.fill(allR, allR),
 		0.02);

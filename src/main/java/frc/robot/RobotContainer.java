@@ -6,7 +6,9 @@ package frc.robot;
 
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -73,7 +75,7 @@ public class RobotContainer {
 		// build UI
 		_autoChooser = buildAutoChooser();
 		_testChooser = buildTestChooser();
-		_stick = new Joystick(0);
+		_stick = new XboxController(0);
 	}
 
 	/**
@@ -91,7 +93,8 @@ public class RobotContainer {
 	 * @return The command. None if null.
 	 */
 	public Command getTeleopCommand() {
-		return new ArcadeDrive(_diffDrive, _stick::getY, _stick::getX);
+		return new ArcadeDrive(_diffDrive, () -> -_stick.getRightY(),
+				() -> -_stick.getRightX());
 	}
 
 	/**
@@ -137,7 +140,6 @@ public class RobotContainer {
 		chooser.addOption("TurnDuration (" + targetSec + "s)",
 				new TurnDuration(_diffDrive, targetFac, targetSec));
 
-		//// SmartDashboard.putData(chooser);
 		SmartDashboard.putData("Auto Mode Commands", chooser);
 		return chooser;
 	}
@@ -154,7 +156,7 @@ public class RobotContainer {
 
 		SendableChooser<Command> chooser = new SendableChooser<>();
 
-		chooser.setDefaultOption("Quasistatic, Forward",
+		chooser.addOption("Quasistatic, Forward",
 				sysidFactory.quasistatic(Direction.kForward));
 		chooser.addOption("Quasistatic, Reverse",
 				sysidFactory.quasistatic(Direction.kReverse));
@@ -163,7 +165,6 @@ public class RobotContainer {
 		chooser.addOption("Dynamic, Reverse",
 				sysidFactory.dynamic(Direction.kReverse));
 
-		//// SmartDashboard.putData(chooser);
 		SmartDashboard.putData("Test Mode Commands", chooser);
 		return chooser;
 	}
@@ -172,5 +173,5 @@ public class RobotContainer {
 	private final SysIdDrivable _sysidDrive;
 	private final SendableChooser<Command> _autoChooser;
 	private final SendableChooser<Command> _testChooser;
-	private final Joystick _stick;
+	private final XboxController _stick;
 }
