@@ -48,7 +48,6 @@ public class DriveDistance extends Command {
 
 	@Override
 	public void end(boolean interrupted) {
-		// stop drive
 		_drive.arcadeDrive(0, 0);
 	}
 

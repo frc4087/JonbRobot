@@ -62,7 +62,8 @@ public class RobotTelemetry {
 	// class
 
 	public static final int SAMPLE_PERIOD_MS = 1000; // 1 sample/sec
-	public static final int NETWORK_ADAPTER_INDEX = 1; // second adapter
+	public static final int NETWORK_ADAPTER_INDEX = 0; // first adapter
+	////public static final int NETWORK_ADAPTER_INDEX = 1; // second adapter
 
 	/**
 	 * Object used for accessing robot wifi status. Executes long system calls

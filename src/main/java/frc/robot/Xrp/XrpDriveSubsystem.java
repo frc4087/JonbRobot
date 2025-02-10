@@ -47,10 +47,10 @@ public class XrpDriveSubsystem extends SubsystemBase
 	public static final double WHEEL_MPS_MAX = WHEEL_RPS_MAX
 			* WHEEL_CIRCUMFERENCE_M;
 
-	public static final double LEFT_KS = 0.73087; // 0.8029;
-	public static final double LEFT_KV = 10.334; // 10.076;
-	public static final double LEFT_KA = 1.5703; // 2.0878;
-	public static final double LEFT_KP = 2.9247; // 2.7555;
+	public static final double LEFT_KS = 1.0494;
+	public static final double LEFT_KV = 9.9313;
+	public static final double LEFT_KA = 2.6492;
+	public static final double LEFT_KP = 9.3688;
 	public static final double LEFT_KI = 0.0000;
 	public static final double LEFT_KD = 0.0000;
 
@@ -108,9 +108,10 @@ public class XrpDriveSubsystem extends SubsystemBase
 				rightMps);
 
 		// System.out.printf(
-		// "spd=%5.2f err=%5.2f pid=%5.2f ffw=%5.2f vlt=%6.2f\n",
-		// leftMps, leftMps - getLeftVelocity(), leftPid, leftFfw,
-		// leftPid + leftFfw);
+		// 		"left: spd=%5.2f err=%5.2f pid=%5.2f ffw=%5.2f vlt=%6.2f\n",
+		// 		leftMps, leftMps - getLeftVelocity(), leftPid, leftFfw,
+		// 		leftPid + leftFfw);
+		System.out.printf("v= %6.2f %6.2f\n", leftFfw + leftPid, rightFfw + rightPid);
 
 		_leftMotor.setVoltage(leftFfw + leftPid);
 		_rightMotor.setVoltage(rightFfw + rightPid);

@@ -6,8 +6,7 @@ package frc.robot;
 
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
-import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.Joystick;
+import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -148,7 +147,8 @@ public class RobotContainer {
 	 * Builds the SmartDashboard chooser for Test mode.
 	 */
 	protected SendableChooser<Command> buildTestChooser() {
-		SysIdRoutine sysidFactory = new SysIdRoutine(new SysIdRoutine.Config(),
+		SysIdRoutine sysidFactory = new SysIdRoutine(new SysIdRoutine.Config(
+				Volts.of(1).per(Second), Volts.of(7), Seconds.of(7)),
 				new SysIdRoutine.Mechanism(
 						_sysidDrive::setVoltage,
 						_sysidDrive::logEntry,

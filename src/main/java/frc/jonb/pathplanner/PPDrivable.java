@@ -29,18 +29,18 @@ public interface PPDrivable extends Subsystem {
     void resetPose(Pose2d pose);
 
     /**
-     * Gets the actual robot relative speed (not neccesarily
-     * that set by setDriveSpeeds()).
-     * 
-     * @return The speeds.
-     */
+	 * Gets the actual robot relative velocities (not neccesarily
+	 * that set by setDriveSpeeds()).
+	 * 
+	 * @return The velocities.
+	 */
     ChassisSpeeds getTrueSpeeds();
 
     /**
-     * Sets the desired robot relative speed.
+     * Sets the desired robot relative velocities.
      * 
      * @param speeds
-     *        The speeds.
+     *        The velocities.
      */
     void setDriveSpeeds(ChassisSpeeds speeds);
 
