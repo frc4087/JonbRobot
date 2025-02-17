@@ -1,5 +1,7 @@
 package frc.jonb.subsystems;
 
+import java.util.List;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 
@@ -27,16 +29,21 @@ public interface DiffDrivable extends Subsystem {
 	 * Sets the desired linear velocity of the drive wheels.)
 	 * 
 	 * @param leftMps
-	 *            Left wheel velocity (m/s).
+	 *                 Left wheel velocity (m/s).
 	 * @param rightMps
-	 *            Right wheel velocity (m/s).
+	 *                 Right wheel velocity (m/s).
 	 */
 	void setWheelVelocity(double leftMps, double rightMps);
 
 	/**
-	 * Resets the wheel encoders to zero distance.
+	 * Resets the wheel encoders to zero distance and velocity.
 	 */
 	void resetEncoders();
+
+	/**
+	 * Resets the motor controllers (i.e. past error and integral term).
+	 */
+	void resetControllers();
 
 	/**
 	 * Gets the current distance traveled by the left wheel, as indicated by its
@@ -91,5 +98,5 @@ public interface DiffDrivable extends Subsystem {
 	 * 
 	 * @return Temp output group.
 	 */
-	Subsystem[] getSubsystems();
+	List<Subsystem> getSubsystems();
 }

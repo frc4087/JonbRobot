@@ -26,7 +26,7 @@ public class DiffDriveSubsystem extends SubsystemBase implements PPDrivable {
 	 * Creates an instance.
 	 * 
 	 * @param drive
-	 *            The differential drivetrain target.
+	 *              The differential drivetrain target.
 	 */
 	public DiffDriveSubsystem(DiffDrivable drive) {
 		ErrorMessages.requireNonNullParam(
@@ -35,12 +35,22 @@ public class DiffDriveSubsystem extends SubsystemBase implements PPDrivable {
 		_drive = drive;
 
 		_subsystems.add(this);
-		Collections.addAll(_subsystems, _drive.getSubsystems());
+		_subsystems.addAll(_drive.getSubsystems());
 
 		_kinematics = new DifferentialDriveKinematics(
 				_drive.getTrackWidth());
 		_odometry = new DifferentialDriveOdometry(
 				new Rotation2d(), 0.0, 0.0);
+
+		double speedMaxFwd = _kinematics
+				.toChassisSpeeds(new DifferentialDriveWheelSpeeds(
+						_drive.getWheelVelocityMax(),
+						_drive.getWheelVelocityMax())).vxMetersPerSecond;
+		double speedMaxCcw = _kinematics
+				.toChassisSpeeds(new DifferentialDriveWheelSpeeds(
+						-_drive.getWheelVelocityMax(),
+						+_drive.getWheelVelocityMax())).omegaRadiansPerSecond;
+		_speedsMax = new ChassisSpeeds(speedMaxFwd, 0.0, speedMaxCcw);
 	}
 
 	/**
@@ -54,11 +64,11 @@ public class DiffDriveSubsystem extends SubsystemBase implements PPDrivable {
 
 	/**
 	 * Sets robot chassis speed factors.
-	 *
+	 * 
 	 * @param forwardFactor
-	 *            Forward speed factor [-1,+1].
+	 *                      Forward speed factor [-1,+1].
 	 * @param rotateSpeed
-	 *            Rotation CCW speed factor [-1,+1].
+	 *                      Rotation CCW speed factor [-1,+1].
 	 */
 	public void arcadeDrive(double forwardFactor, double ccwFactor) {
 		WheelSpeeds wheelSpeedFactors = DifferentialDrive.arcadeDriveIK(
@@ -70,11 +80,11 @@ public class DiffDriveSubsystem extends SubsystemBase implements PPDrivable {
 
 	/**
 	 * Sets robot wheel speed factors.
-	 *
+	 * 
 	 * @param leftFactor
-	 *            Left wheel forward speed factor [-1,+1].
+	 *                    Left wheel forward speed factor [-1,+1].
 	 * @param rightFactor
-	 *            Right wheel forward speed factor [-1,+1].
+	 *                    Right wheel forward speed factor [-1,+1].
 	 */
 	public void tankDrive(double leftFactor, double rightFactor) {
 		_drive.setWheelVelocity(
@@ -85,9 +95,13 @@ public class DiffDriveSubsystem extends SubsystemBase implements PPDrivable {
 	// PPDrivable
 
 	@Override
-	public Pose2d getPose() {
-		return _odometry.getPoseMeters();
+	public ChassisSpeeds getTrueSpeeds() {
+		DifferentialDriveWheelSpeeds wheelSpeeds = new DifferentialDriveWheelSpeeds(
+				_drive.getLeftVelocity(), _drive.getRightVelocity());
+		return _kinematics.toChassisSpeeds(wheelSpeeds);
 	}
+
+	// CommandDrivable
 
 	@Override
 	public void resetPose(Pose2d pose) {
@@ -100,10 +114,8 @@ public class DiffDriveSubsystem extends SubsystemBase implements PPDrivable {
 	}
 
 	@Override
-	public ChassisSpeeds getTrueSpeeds() {
-		DifferentialDriveWheelSpeeds wheelSpeeds = new DifferentialDriveWheelSpeeds(
-				_drive.getLeftVelocity(), _drive.getRightVelocity());
-		return _kinematics.toChassisSpeeds(wheelSpeeds);
+	public Pose2d getPose() {
+		return _odometry.getPoseMeters();
 	}
 
 	@Override
@@ -115,13 +127,30 @@ public class DiffDriveSubsystem extends SubsystemBase implements PPDrivable {
 	}
 
 	@Override
+	public ChassisSpeeds getMaxSpeeds() {
+		return _speedsMax;
+	}
+
+	@Override
+	public void stop() {
+		_drive.resetControllers();
+
+		// reset encoder velocity but maintain pose
+		Pose2d poseNow = getPose();
+		resetPose(poseNow);
+
+		// last, after all other resets
+		_drive.setWheelVelocity(0.0, 0.0);
+	}
+
+	@Override
 	public boolean isHolonomic() {
 		return false;
 	}
 
 	@Override
-	public Subsystem[] getSubsystems() {
-		return _subsystems.toArray(Subsystem[]::new);
+	public List<Subsystem> getSubsystems() {
+		return Collections.unmodifiableList(_subsystems);
 	}
 
 	// Subsystem
@@ -137,8 +166,9 @@ public class DiffDriveSubsystem extends SubsystemBase implements PPDrivable {
 
 	// personal
 
-	private DiffDrivable _drive;
-	private List<Subsystem> _subsystems = new ArrayList<>();
+	private final DiffDrivable _drive;
+	private final List<Subsystem> _subsystems = new ArrayList<>();
+	private final ChassisSpeeds _speedsMax;
 
 	private final DifferentialDriveKinematics _kinematics;
 	private final DifferentialDriveOdometry _odometry;

@@ -11,6 +11,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.util.ErrorMessages;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 
 /**
  * Represents a bridge between PathPlanner and a PPDrivable subsystem.
@@ -19,7 +20,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 public class PPBridge<T extends PPDrivable> {
 	/**
 	 * For extension.
-	 * 
 	 * @param drive
 	 *            target drivetrain.
 	 */
@@ -41,9 +41,9 @@ public class PPBridge<T extends PPDrivable> {
 		double allQ = 0.03;
 		double allR = 0.05;
 		PPLTVController controller = new PPLTVController(
-		VecBuilder.fill(allQ, allQ, allQ), VecBuilder.fill(allR, allR),
-		0.02);
-		////PathFollowingController controller = new MyController();
+				VecBuilder.fill(allQ, allQ, allQ), VecBuilder.fill(allR, allR),
+				0.02);
+		//// PathFollowingController controller = new MyController();
 
 		// connect PP to drivetrain
 		AutoBuilder.configure(
@@ -54,12 +54,11 @@ public class PPBridge<T extends PPDrivable> {
 				controller,
 				config,
 				PPBridge::isPathFlipped,
-				_drive.getSubsystems());
+				_drive.getSubsystems().toArray(new Subsystem[0]));
 	}
 
 	/**
 	 * Gets the target drivetrain.
-	 * 
 	 * @return Shared exposed drivetrain.
 	 */
 	public T getDrive() {
@@ -76,7 +75,6 @@ public class PPBridge<T extends PPDrivable> {
 	 * Establishes a bridge between PathPlannerf and a given drivetrain
 	 * subsystem,
 	 * and returns the bridge object, if needed.
-	 * 
 	 * @param drive
 	 *            Target drive train.
 	 */
@@ -87,7 +85,6 @@ public class PPBridge<T extends PPDrivable> {
 	/**
 	 * Returns true if the path being followed should be mirrored (i.e. for the
 	 * red alliance)
-	 * 
 	 * @return The state.
 	 */
 	public static boolean isPathFlipped() {
@@ -98,7 +95,7 @@ public class PPBridge<T extends PPDrivable> {
 		return false;
 	}
 
-	public  class MyController implements PathFollowingController {
+	public class MyController implements PathFollowingController {
 
 		@Override
 		public ChassisSpeeds calculateRobotRelativeSpeeds(Pose2d currentPose,
@@ -107,12 +104,13 @@ public class PPBridge<T extends PPDrivable> {
 			double forwardMps = poseError.getX() * 1.0;
 			double turnRps = poseError.getRotation().getRadians() * 1.0;
 			// System.out.printf(
-			// 		"MyController: z=%6.1f errXYZ=%5.2f %5.2f %6.1f velXZ=%6.3f %6.3f\n",
-			// 		_drive.getPose().getRotation().getDegrees(),
-			// 		//currentPose.getRotation().getDegrees(),
-			// 		poseError.getX(),
-			// 		poseError.getY(), poseError.getRotation().getDegrees(),
-			// 		forwardMps, turnRps * 2.0 * Math.PI);
+			// "MyController: z=%6.1f errXYZ=%5.2f %5.2f %6.1f velXZ=%6.3f
+			// %6.3f\n",
+			// _drive.getPose().getRotation().getDegrees(),
+			// //currentPose.getRotation().getDegrees(),
+			// poseError.getX(),
+			// poseError.getY(), poseError.getRotation().getDegrees(),
+			// forwardMps, turnRps * 2.0 * Math.PI);
 			return new ChassisSpeeds(forwardMps, 0.0, turnRps);
 		}
 

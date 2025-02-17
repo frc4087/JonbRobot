@@ -25,7 +25,7 @@ public class Robot extends TimedRobot {
 	 * initialization code.
 	 */
 	public Robot() {
-		RobotType type = RobotType.ROMI;
+		RobotType type = RobotType.XRP;
 		m_robotContainer = new RobotContainer(type);
 		m_robotTelemetry = new RobotTelemetry(type);
 	}

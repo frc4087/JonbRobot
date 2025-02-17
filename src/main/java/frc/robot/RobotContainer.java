@@ -4,9 +4,14 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Second;
+import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.Volts;
+
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
-import static edu.wpi.first.units.Units.*;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -20,12 +25,12 @@ import frc.robot.Robot.RobotType;
 import frc.robot.Romi.RomiRobot;
 import frc.robot.Xrp.XrpRobot;
 import frc.robot.commands.ArcadeDrive;
-import frc.robot.commands.AutoDistance;
-import frc.robot.commands.AutoDuration;
-import frc.robot.commands.DriveDistance;
-import frc.robot.commands.DriveDuration;
-import frc.robot.commands.TurnAngle;
-import frc.robot.commands.TurnDuration;
+import frc.robot.commands.DriveToPose;
+import frc.robot.commands.RawDriveDistance;
+import frc.robot.commands.RawDriveDuration;
+import frc.robot.commands.RawTurnAngle;
+import frc.robot.commands.RawTurnDuration;
+import frc.robot.commands.StopAndReset;
 
 /**
  * Build and configures the guts (subsystems) and brain (logic) of the robot.
@@ -43,7 +48,7 @@ public class RobotContainer {
 	 * Creates an instance.
 	 * 
 	 * @param type
-	 *            Robot type.
+	 *             Robot type.
 	 */
 	public RobotContainer(RobotType type) {
 		// build robot guts
@@ -79,7 +84,7 @@ public class RobotContainer {
 
 	/**
 	 * Gets the current command selected in the Auto Mode chooser.
-	 *
+	 * 
 	 * @return The command. None if null.
 	 */
 	public Command getAutonomousCommand() {
@@ -88,7 +93,7 @@ public class RobotContainer {
 
 	/**
 	 * Gets the current command selected in the Auto Mode chooser.
-	 *
+	 * 
 	 * @return The command. None if null.
 	 */
 	public Command getTeleopCommand() {
@@ -98,7 +103,7 @@ public class RobotContainer {
 
 	/**
 	 * Gets the current command selected in the Test Mode chooser.
-	 *
+	 * 
 	 * @return The command. None if null.
 	 */
 	public Command getTestCommand() {
@@ -114,30 +119,39 @@ public class RobotContainer {
 	protected SendableChooser<Command> buildAutoChooser() {
 		SendableChooser<Command> chooser = new SendableChooser<>();
 
-		chooser.setDefaultOption("PathPlanner",
+		chooser.addOption("PathPlanner",
 				new PathPlannerAuto("LoopAutoPath"));
-		chooser.addOption("AutoDistance (0.5m)",
-				new AutoDistance(_diffDrive, 0.5, 0.5));
+		chooser.addOption("DriveToPose (+0.5m, +90deg)",
+				new StopAndReset(_diffDrive)
+						.andThen(new DriveToPose(_diffDrive, new Pose2d(+0.5, 0, Rotation2d.fromDegrees(+90.0)), 0.5))
+						.andThen(new StopAndReset(_diffDrive)));
 		chooser.addOption("DriveDistance (+0.5m)",
-				new DriveDistance(_diffDrive, 0.5, 0.5));
+				new RawDriveDistance(_diffDrive, +0.5, 0.5));
 		chooser.addOption("DriveDistance (-0.5m)",
-				new DriveDistance(_diffDrive, 0.5, -0.5));
+				new RawDriveDistance(_diffDrive, -0.5, 0.5));
 		chooser.addOption("TurnAngle (+90deg)",
-				new TurnAngle(_diffDrive, 0.5, 90.0));
+				new RawTurnAngle(_diffDrive, 0.5, 90.0));
 		chooser.addOption("TurnAngle (-90deg)",
-				new TurnAngle(_diffDrive, 0.5, -90.0));
+				new RawTurnAngle(_diffDrive, -0.5, 90.0));
 
-		double targetSec = 4.0;
-		double targetMps = 0.125;
-		double targetFac = targetMps / _diffDrive.getDrive()
-				.getWheelVelocityMax();
+		double targetSec = 2.0;
 
-		chooser.addOption("AutoDuration (" + targetSec + "s)",
-				new AutoDuration(_diffDrive, targetFac, targetSec));
-		chooser.addOption("DriveDuration (" + targetSec + "s)",
-				new DriveDuration(_diffDrive, targetFac, targetSec));
-		chooser.addOption("TurnDuration (" + targetSec + "s)",
-				new TurnDuration(_diffDrive, targetFac, targetSec));
+		double targetMps = 0.25;
+		double targetDriveFac = targetMps
+				/ _diffDrive.getMaxSpeeds().vxMetersPerSecond;
+
+		double targetDps = 90.0;
+		double targetTurnFac = targetDps / Math.toDegrees(_diffDrive
+				.getMaxSpeeds().omegaRadiansPerSecond);
+
+		chooser.addOption(
+				"DriveDuration (" + targetSec + "s, " + targetMps * targetSec
+						+ "m)",
+				new RawDriveDuration(_diffDrive, targetDriveFac, targetSec));
+		chooser.addOption(
+				"TurnDuration (" + targetSec + "s, " + targetDps * targetSec
+						+ "deg)",
+				new RawTurnDuration(_diffDrive, targetTurnFac, targetSec));
 
 		SmartDashboard.putData("Auto Mode Commands", chooser);
 		return chooser;

@@ -5,6 +5,7 @@
 package frc.robot.Romi;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -33,26 +34,26 @@ import frc.jonb.sysid.SysIdDrivable;
  */
 public class RomiDriveSubsystem extends SubsystemBase
 		implements DiffDrivable, SysIdDrivable {
-	public static final double WHEEL_TRACKWIDTH_M = 0.1385; //0.141;
+	public static final double WHEEL_TRACKWIDTH_M = 0.1385; // 0.141;
 	public static final double WHEEL_ENCODER_CPR = 1440.0;
-	public static final double WHEEL_DIAMETER_M = 0.0697; //0.07;
+	public static final double WHEEL_DIAMETER_M = 0.0697; // 0.07;
 	public static final double WHEEL_CIRCUMFERENCE_M = Math.PI
 			* WHEEL_DIAMETER_M;
 	public static final double WHEEL_RPS_MAX = 150.0 / 60.0; // from WPI docs
 	public static final double WHEEL_MPS_MAX = WHEEL_RPS_MAX
 			* WHEEL_CIRCUMFERENCE_M;
 
-	public static final double LEFT_KS = 0.73087; // 0.8029;
-	public static final double LEFT_KV = 10.334; // 10.076;
-	public static final double LEFT_KA = 1.5703; // 2.0878;
-	public static final double LEFT_KP = 2.9247; // 2.7555;
+	public static final double LEFT_KS = 0.73087;
+	public static final double LEFT_KV = 10.334;
+	public static final double LEFT_KA = 1.5703;
+	public static final double LEFT_KP = 2.9247; // V/M/S
 	public static final double LEFT_KI = 0.0000;
 	public static final double LEFT_KD = 0.0000;
 
-	public static final double RIGHT_KS = 0.79424; // 0.4714;
-	public static final double RIGHT_KV = 7.5; // 9.8306; //9.7982;
-	public static final double RIGHT_KA = 1.4868; // 2.5502;
-	public static final double RIGHT_KP = 2.7573; // 3.8658;
+	public static final double RIGHT_KS = 0.79424;
+	public static final double RIGHT_KV = 7.5;
+	public static final double RIGHT_KA = 1.4868;
+	public static final double RIGHT_KP = 2.7573; // V/M/S
 	public static final double RIGHT_KI = 0.00000;
 	public static final double RIGHT_KD = 0.00000;
 
@@ -94,12 +95,12 @@ public class RomiDriveSubsystem extends SubsystemBase
 
 	@Override
 	public void setWheelVelocity(double leftMps, double rightMps) {
-		double leftFfw = _leftFeedforward.calculate(leftMps);
-		double rightFfw = _rightFeedforward.calculate(rightMps);
+		Voltage leftFfw = _leftFeedforward.calculate(Units.MetersPerSecond.of(leftMps));
+		Voltage rightFfw = _rightFeedforward.calculate(Units.MetersPerSecond.of(rightMps));
 
-		double leftPid = _leftVelocityPid.calculate(getLeftVelocity(),
+		double leftPidVolts = _leftVelocityPid.calculate(getLeftVelocity(),
 				leftMps);
-		double rightPid = _rightVelocityPid.calculate(getRightVelocity(),
+		double rightPidVolts = _rightVelocityPid.calculate(getRightVelocity(),
 				rightMps);
 
 		// System.out.printf(
@@ -107,8 +108,14 @@ public class RomiDriveSubsystem extends SubsystemBase
 		// leftMps, leftMps - getLeftVelocity(), leftPid, leftFfw,
 		// leftPid + leftFfw);
 
-		_leftMotor.setVoltage(leftFfw + leftPid);
-		_rightMotor.setVoltage(rightFfw + rightPid);
+		_leftMotor.setVoltage(leftFfw.in(Units.Volts) + leftPidVolts);
+		_rightMotor.setVoltage(rightFfw.in(Units.Volts) + rightPidVolts);
+	}
+
+	@Override
+	public void resetControllers() {
+		_leftVelocityPid.reset();
+		_rightVelocityPid.reset();
 	}
 
 	@Override
@@ -149,8 +156,8 @@ public class RomiDriveSubsystem extends SubsystemBase
 	}
 
 	@Override
-	public Subsystem[] getSubsystems() {
-		return _subsystems.toArray(Subsystem[]::new);
+	public List<Subsystem> getSubsystems() {
+		return Collections.unmodifiableList(_subsystems);
 	}
 
 	// SysIdDrivable
@@ -204,5 +211,4 @@ public class RomiDriveSubsystem extends SubsystemBase
 	private final MutDistance _dummyDistance = Units.Meters.mutable(0);
 	private final MutLinearVelocity _dummyVelocity = Units.MetersPerSecond
 			.mutable(0);
-
 }

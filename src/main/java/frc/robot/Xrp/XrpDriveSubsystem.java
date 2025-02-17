@@ -5,6 +5,7 @@
 package frc.robot.Xrp;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -50,15 +51,15 @@ public class XrpDriveSubsystem extends SubsystemBase
 	public static final double LEFT_KS = 1.0494;
 	public static final double LEFT_KV = 9.9313;
 	public static final double LEFT_KA = 2.6492;
-	public static final double LEFT_KP = 9.3688;
-	public static final double LEFT_KI = 0.0000;
+	public static final double LEFT_KP = 9.3688; // V/M/S
+	public static final double LEFT_KI = 0.002;
 	public static final double LEFT_KD = 0.0000;
 
-	public static final double RIGHT_KS = 0.79424; // 0.4714;
-	public static final double RIGHT_KV = 7.5; // 9.8306; //9.7982;
-	public static final double RIGHT_KA = 1.4868; // 2.5502;
-	public static final double RIGHT_KP = 2.7573; // 3.8658;
-	public static final double RIGHT_KI = 0.00000;
+	public static final double RIGHT_KS = 0.79424;
+	public static final double RIGHT_KV = 7.5;
+	public static final double RIGHT_KA = 1.4868;
+	public static final double RIGHT_KP = 2.7573; // V/M/S
+	public static final double RIGHT_KI = 0.002;
 	public static final double RIGHT_KD = 0.00000;
 
 	/** Creates a new Drivetrain. */
@@ -99,22 +100,31 @@ public class XrpDriveSubsystem extends SubsystemBase
 
 	@Override
 	public void setWheelVelocity(double leftMps, double rightMps) {
-		double leftFfw = _leftFeedforward.calculate(leftMps);
-		double rightFfw = _rightFeedforward.calculate(rightMps);
+		Voltage leftFfw = _leftFeedforward
+				.calculate(Units.MetersPerSecond.of(leftMps));
+		Voltage rightFfw = _rightFeedforward
+				.calculate(Units.MetersPerSecond.of(rightMps));
 
-		double leftPid = _leftVelocityPid.calculate(getLeftVelocity(),
+		double leftPidVolts = _leftVelocityPid.calculate(getLeftVelocity(),
 				leftMps);
-		double rightPid = _rightVelocityPid.calculate(getRightVelocity(),
+		double rightPidVolts = _rightVelocityPid.calculate(getRightVelocity(),
 				rightMps);
 
-		// System.out.printf(
-		// 		"left: spd=%5.2f err=%5.2f pid=%5.2f ffw=%5.2f vlt=%6.2f\n",
-		// 		leftMps, leftMps - getLeftVelocity(), leftPid, leftFfw,
-		// 		leftPid + leftFfw);
-		System.out.printf("v= %6.2f %6.2f\n", leftFfw + leftPid, rightFfw + rightPid);
+		double leftVolts = leftFfw.in(Units.Volts) + leftPidVolts;
+		double rightVolts = rightFfw.in(Units.Volts) + rightPidVolts;
 
-		_leftMotor.setVoltage(leftFfw + leftPid);
-		_rightMotor.setVoltage(rightFfw + rightPid);
+		////System.out.printf("XrpDriveSubsystem: l= %6.2f %6.2f, r= %6.2f %6.2f; vel= %6.2f %6.2f\n", 
+		////leftFfw.in(Units.Volts), leftPidVolts, rightFfw.in(Units.Volts), rightPidVolts,
+		////getLeftVelocity(), getRightVelocity());
+
+		_leftMotor.setVoltage(leftVolts);
+		_rightMotor.setVoltage(rightVolts);
+	}
+
+	@Override
+	public void resetControllers() {
+		_leftVelocityPid.reset();
+		_rightVelocityPid.reset();
 	}
 
 	@Override
@@ -155,8 +165,8 @@ public class XrpDriveSubsystem extends SubsystemBase
 	}
 
 	@Override
-	public Subsystem[] getSubsystems() {
-		return _subsystems.toArray(Subsystem[]::new);
+	public List<Subsystem> getSubsystems() {
+		return Collections.unmodifiableList(_subsystems);
 	}
 
 	// SysIdDrivable
