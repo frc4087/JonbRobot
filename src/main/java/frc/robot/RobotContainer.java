@@ -30,7 +30,7 @@ import frc.robot.commands.RawDriveDistance;
 import frc.robot.commands.RawDriveDuration;
 import frc.robot.commands.RawTurnAngle;
 import frc.robot.commands.RawTurnDuration;
-import frc.robot.commands.StopAndReset;
+import frc.robot.commands.ZeroPose;
 
 /**
  * Build and configures the guts (subsystems) and brain (logic) of the robot.
@@ -60,6 +60,7 @@ public class RobotContainer {
 						romiRobot.getRawDrivetrain());
 				break;
 			case SWERVE:
+				////System.out.println("RobotContainer: fix SWERVE");
 				throw new IllegalStateException(
 						"RobotType[" + type + "] is not yet implemented.");
 			case XRP:
@@ -122,9 +123,8 @@ public class RobotContainer {
 		chooser.addOption("PathPlanner",
 				new PathPlannerAuto("LoopAutoPath"));
 		chooser.addOption("DriveToPose (+0.5m, +90deg)",
-				new StopAndReset(_diffDrive)
-						.andThen(new DriveToPose(_diffDrive, new Pose2d(+0.5, 0, Rotation2d.fromDegrees(+90.0)), 0.5))
-						.andThen(new StopAndReset(_diffDrive)));
+				new ZeroPose(_diffDrive)
+						.andThen(new DriveToPose(_diffDrive, new Pose2d(+0.5, 0, Rotation2d.fromDegrees(+90.0)), 0.5)));
 		chooser.addOption("DriveDistance (+0.5m)",
 				new RawDriveDistance(_diffDrive, +0.5, 0.5));
 		chooser.addOption("DriveDistance (-0.5m)",

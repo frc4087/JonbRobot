@@ -28,6 +28,7 @@ public class RobotTelemetry {
 				_robotIp = "10.0.0.2";
 				break;
 			case SWERVE:
+				////System.out.println("RobotTelemetry: fix SWERVE");
 				throw new IllegalStateException(
 						"RobotType[" + type + "] is not yet implemented.");
 			case XRP:

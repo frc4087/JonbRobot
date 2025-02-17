@@ -18,9 +18,10 @@ import frc.jonb.subsystems.CommandDrivable;
 
 /**
  * Commands the robot to drive from its current pose to a new pose at a given
- * speed. Does not reset pose or speed at the beginning or end of the command to
- * support chaining. As needed, execute ZeroPoseAndSpeed before and/or after
- * this command.
+ * speed. The nature of the command does not lend itself to chaining, as in a
+ * path. Use PathPlanner instead. As such, zeros the speed at the beginning and
+ * end of the command, but does not reset pose. As needed, use separate commands
+ * before or after this call to reset the pose (e.g. ZeroPose).
  * <p>
  * Makes generous assumptions about error tolerance and PID tuning.
  * <p>
@@ -72,7 +73,7 @@ public class DriveToPose extends Command {
 
 	@Override
 	public void initialize() {
-		// do nothing: keep going, do not reset pose or speed
+		_drive.stop();
 	}
 
 	@Override
@@ -99,7 +100,7 @@ public class DriveToPose extends Command {
 
 	@Override
 	public void end(boolean interrupted) {
-		// do nothing: keep going, do not reset pose or speed
+		_drive.stop();
 	}
 
 	@Override

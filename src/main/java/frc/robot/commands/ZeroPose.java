@@ -9,21 +9,20 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.jonb.subsystems.CommandDrivable;
 
 /**
- * Command that stops chassis movement and resets the drive pose to zero.
+ * Command that resets the drive pose to zero.
  */
-public class StopAndReset extends Command {
+public class ZeroPose extends Command {
 	/**
 	 * Creates an instance.
 	 * @param drive The target drivetrain.
 	 */
-	public StopAndReset(CommandDrivable drive) {
+	public ZeroPose(CommandDrivable drive) {
 		_drive = drive;
 		addRequirements(drive);
 	}
 
 	@Override
 	public void initialize() {
-		_drive.stop();
 		_drive.resetPose(Pose2d.kZero);
 	}
 
