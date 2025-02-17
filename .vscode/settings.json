@@ -29,7 +29,7 @@
   "java.test.defaultConfig": "WPIlibUnitTests",
   "editor.rename.enablePreview": false,
   "java.format.comments.enabled": true,
-  "java.format.settings.url": "C:\\Users\\Public\\wpilib\\2025\\vscode\\data\\extensions\\redhat.java-1.38.2024120508-win32-x64\\formatters\\eclipse-formatter.xml",
+  "java.format.settings.url": "C:/Users/Public/wpilib/2025/vscode/data/extensions/redhat.java-1.40.2025021308-win32-x64/formatters/eclipse-formatter-jonb.xml",
   "[java]": {
     "editor.insertSpaces": false,
     "editor.detectIndentation": false

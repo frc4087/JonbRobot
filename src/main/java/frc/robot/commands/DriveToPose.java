@@ -23,6 +23,9 @@ import frc.jonb.subsystems.CommandDrivable;
  * this command.
  * <p>
  * Makes generous assumptions about error tolerance and PID tuning.
+ * <p>
+ * TODO: Delegate profile and controller building to the drive since it best
+ * knows its needs and constraints.
  */
 public class DriveToPose extends Command {
 	/**
@@ -40,6 +43,7 @@ public class DriveToPose extends Command {
 		_poseEnd = pose;
 		_speeds = _drive.getMaxSpeeds().times(speedFactor);
 
+		// build controller
 		Pose2d tolerance = new Pose2d(0.1, 0.1, Rotation2d.fromDegrees(3.0));
 		if (_drive.isHolonomic()) {
 			PIDController pidX = new PIDController(1.0, 0.0, 0.0);
@@ -61,8 +65,9 @@ public class DriveToPose extends Command {
 			_diffPid.setTolerance(tolerance);
 		}
 
-		// System.out.printf("DriveToPose: %6.2f %6.2f %6.1f\n", _poseEnd.getX(), _poseEnd.getY(),
-		// 		_poseEnd.getRotation().getDegrees());
+		// System.out.printf("DriveToPose: %6.2f %6.2f %6.1f\n", _poseEnd.getX(),
+		// _poseEnd.getY(),
+		// _poseEnd.getRotation().getDegrees());
 	}
 
 	@Override
@@ -78,18 +83,18 @@ public class DriveToPose extends Command {
 			speeds = _holoPid.calculate(poseNow, _poseEnd,
 					_speeds.vxMetersPerSecond, _poseEnd.getRotation());
 		} else {
-			speeds = _diffPid.calculate(poseNow, _poseEnd,
-					// _speeds.vxMetersPerSecond, _speeds.omegaRadiansPerSecond);
-					0.0, 0.0);
+			speeds = _diffPid.calculate(poseNow, _poseEnd, 0.0, 0.0);
 		}
 		_drive.setDriveSpeeds(speeds);
 
 		// report error
-		Pose2d err = _poseEnd.relativeTo(poseNow);
-		// System.out.printf("    err= %6.2f %6.2f %6.1f; spd= %6.2f %6.2f %6.1f\n", err.getX(), err.getY(),
-		// 		err.getRotation().getDegrees(), speeds.vxMetersPerSecond,
-		// 		speeds.vyMetersPerSecond, Math.toDegrees(speeds.omegaRadiansPerSecond), poseNow.getX(), poseNow.getY(),
-		// 		poseNow.getRotation().getDegrees());
+		// Pose2d err = _poseEnd.relativeTo(poseNow);
+		// System.out.printf(" err= %6.2f %6.2f %6.1f; spd= %6.2f %6.2f %6.1f\n",
+		// err.getX(), err.getY(),
+		// err.getRotation().getDegrees(), speeds.vxMetersPerSecond,
+		// speeds.vyMetersPerSecond, Math.toDegrees(speeds.omegaRadiansPerSecond),
+		// poseNow.getX(), poseNow.getY(),
+		// poseNow.getRotation().getDegrees());
 	}
 
 	@Override

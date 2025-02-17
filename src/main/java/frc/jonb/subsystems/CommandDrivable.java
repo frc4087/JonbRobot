@@ -70,4 +70,45 @@ public interface CommandDrivable extends Subsystem {
 	 * @return Temp output group.
 	 */
 	List<Subsystem> getSubsystems();
+
+	// // class
+
+	// public static class Constraints {
+	// 	public Constraints(double fwdMpsMax, double lftMpsMax, double ccwDpsMax, double fwdMppsMax, double lftMppsMax,
+	// 			double ccwDppsMax) {
+	// 		_fwdMpsMax = fwdMpsMax; _lftMpsMax = lftMpsMax; _ccwDpsMax = ccwDpsMax; _fwdMppsMax = fwdMppsMax; 
+	// 		_lftMppsMax = lftMppsMax; _ccwDppsMax = ccwDppsMax;
+	// 	}
+
+	// 	public double getFwdMpsMax() {
+	// 		return _fwdMpsMax;
+	// 	}
+
+	// 	public double getLftMpsMax() {
+	// 		return _lftMpsMax;
+	// 	}
+
+	// 	public double getCcwDpsMax() {
+	// 		return _ccwDpsMax;
+	// 	}
+
+	// 	public double getFwdMppsMax() {
+	// 		return _fwdMppsMax;
+	// 	}
+
+	// 	public double getLftMppsMax() {
+	// 		return _lftMppsMax;
+	// 	}
+
+	// 	public double getCcwDppsMax() {
+	// 		return _ccwDppsMax;
+	// 	}
+
+	// 	private final double _fwdMpsMax;
+	// 	private final double _lftMpsMax;
+	// 	private final double _ccwDpsMax;
+	// 	private final double _fwdMppsMax;
+	// 	private final double _lftMppsMax;
+	// 	private final double _ccwDppsMax;
+	// }
 }
