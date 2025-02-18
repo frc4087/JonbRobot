@@ -2,21 +2,21 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.xrp;
+package frc.robot.swerve;
 
-import frc.jonb.subsystems.DiffDrivable;
+import frc.jonb.subsystems.HoloDrivable;
 import frc.jonb.sysid.SysIdDrivable;
 
 /**
- * A robot based on the XRP framework, with drivetraoin and peripheral
+ * A robot based on the Swerve framework, with drivetraoin and peripheral
  * subsystem delegates.
  */
-public class XrpRobot {
+public class SwerveRobot {
 	/**
 	 * Creates an instance.
 	 */
-	public XrpRobot() {
-		_rawDrive = new XrpDriveSubsystem();
+	public SwerveRobot() {
+		_rawDrive = new SwerveDriveSubsystem();
 	}
 
 	/**
@@ -24,7 +24,7 @@ public class XrpRobot {
 	 * 
 	 * @return The object.
 	 */
-	public DiffDrivable getRawDrivetrain() {
+	public HoloDrivable getRawDrivetrain() {
 		return _rawDrive;
 	}
 
@@ -39,5 +39,5 @@ public class XrpRobot {
 
 	// personal
 
-	private final XrpDriveSubsystem _rawDrive;
+	private final SwerveDriveSubsystem _rawDrive;
 }

@@ -12,18 +12,18 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.jonb.pathplanner.PPBridge;
+import frc.jonb.pathplanner.PPDrivable;
 import frc.jonb.subsystems.DiffDriveSubsystem;
+import frc.jonb.subsystems.HoloDriveSubsystem;
 import frc.jonb.sysid.SysIdDrivable;
 import frc.robot.Robot.RobotType;
-import frc.robot.Romi.RomiRobot;
-import frc.robot.Xrp.XrpRobot;
 import frc.robot.commands.ArcadeDrive;
 import frc.robot.commands.DriveToPose;
 import frc.robot.commands.RawDriveDistance;
@@ -31,6 +31,9 @@ import frc.robot.commands.RawDriveDuration;
 import frc.robot.commands.RawTurnAngle;
 import frc.robot.commands.RawTurnDuration;
 import frc.robot.commands.ZeroPose;
+import frc.robot.romi.RomiRobot;
+import frc.robot.swerve.SwerveRobot;
+import frc.robot.xrp.XrpRobot;
 
 /**
  * Build and configures the guts (subsystems) and brain (logic) of the robot.
@@ -56,17 +59,19 @@ public class RobotContainer {
 			case ROMI:
 				RomiRobot romiRobot = new RomiRobot();
 				_sysidDrive = romiRobot.getSysidDrivetrain();
-				_diffDrive = new DiffDriveSubsystem(
+				_ppDrive = new DiffDriveSubsystem(
 						romiRobot.getRawDrivetrain());
 				break;
 			case SWERVE:
-				////System.out.println("RobotContainer: fix SWERVE");
-				throw new IllegalStateException(
-						"RobotType[" + type + "] is not yet implemented.");
+				SwerveRobot swerveRobot = new SwerveRobot();
+				_sysidDrive = swerveRobot.getSysidDrivetrain();
+				_ppDrive = new HoloDriveSubsystem(
+						swerveRobot.getRawDrivetrain());
+				break;
 			case XRP:
 				XrpRobot xrpRobot = new XrpRobot();
 				_sysidDrive = xrpRobot.getSysidDrivetrain();
-				_diffDrive = new DiffDriveSubsystem(
+				_ppDrive = new DiffDriveSubsystem(
 						xrpRobot.getRawDrivetrain());
 				break;
 			default:
@@ -75,12 +80,28 @@ public class RobotContainer {
 		}
 
 		// connect PathPlanner
-		PPBridge.buildBridge(_diffDrive);
+		PPBridge.buildBridge(_ppDrive);
 
 		// build UI
 		_autoChooser = buildAutoChooser();
 		_testChooser = buildTestChooser();
-		_stick = new XboxController(0);
+		_xbox = new CommandXboxController(0);
+
+		/////////////////
+		// CommandXboxController xbox = new CommandXboxController(0);
+		// XboxController xboxHid = xbox.getHID();
+
+		// xbox.a().onTrue(new InstantCommand(
+		// 		() -> System.out.println("RobotContainer: Button A")));
+		// xbox.povUp().onTrue(new InstantCommand(
+		// 		() -> System.out.println("RobotContainer: POV Up")));
+		// new Trigger(xboxHid.povRight(CommandScheduler.getInstance().getDefaultButtonLoop()))
+		// 		.onTrue(new InstantCommand(
+		// 				() -> System.out.println("RobotContainer: POV Right")));
+		// new Trigger(xboxHid.pov(270, CommandScheduler.getInstance().getDefaultButtonLoop()))
+		// 		.onTrue(new InstantCommand(
+		//				() -> System.out.println("RobotContainer: POV 270")));
+		/////////////////
 	}
 
 	/**
@@ -98,8 +119,8 @@ public class RobotContainer {
 	 * @return The command. None if null.
 	 */
 	public Command getTeleopCommand() {
-		return new ArcadeDrive(_diffDrive, () -> -_stick.getRightY(),
-				() -> -_stick.getRightX());
+		return new ArcadeDrive(_ppDrive, () -> -_xbox.getRightY(),
+				() -> -_xbox.getRightX());
 	}
 
 	/**
@@ -123,35 +144,35 @@ public class RobotContainer {
 		chooser.addOption("PathPlanner",
 				new PathPlannerAuto("LoopAutoPath"));
 		chooser.addOption("DriveToPose (+0.5m, +90deg)",
-				new ZeroPose(_diffDrive)
-						.andThen(new DriveToPose(_diffDrive, new Pose2d(+0.5, 0, Rotation2d.fromDegrees(+90.0)), 0.5)));
+				new ZeroPose(_ppDrive)
+						.andThen(new DriveToPose(_ppDrive, new Pose2d(+0.5, 0.0, Rotation2d.fromDegrees(0.0)), 0.5)));
 		chooser.addOption("DriveDistance (+0.5m)",
-				new RawDriveDistance(_diffDrive, +0.5, 0.5));
+				new RawDriveDistance(_ppDrive, +0.5, 0.5));
 		chooser.addOption("DriveDistance (-0.5m)",
-				new RawDriveDistance(_diffDrive, -0.5, 0.5));
+				new RawDriveDistance(_ppDrive, -0.5, 0.5));
 		chooser.addOption("TurnAngle (+90deg)",
-				new RawTurnAngle(_diffDrive, 0.5, 90.0));
+				new RawTurnAngle(_ppDrive, 0.5, 90.0));
 		chooser.addOption("TurnAngle (-90deg)",
-				new RawTurnAngle(_diffDrive, -0.5, 90.0));
+				new RawTurnAngle(_ppDrive, -0.5, 90.0));
 
 		double targetSec = 2.0;
 
 		double targetMps = 0.25;
 		double targetDriveFac = targetMps
-				/ _diffDrive.getMaxSpeeds().vxMetersPerSecond;
+				/ _ppDrive.getMaxSpeeds().vxMetersPerSecond;
 
 		double targetDps = 90.0;
-		double targetTurnFac = targetDps / Math.toDegrees(_diffDrive
+		double targetTurnFac = targetDps / Math.toDegrees(_ppDrive
 				.getMaxSpeeds().omegaRadiansPerSecond);
 
 		chooser.addOption(
 				"DriveDuration (" + targetSec + "s, " + targetMps * targetSec
 						+ "m)",
-				new RawDriveDuration(_diffDrive, targetDriveFac, targetSec));
+				new RawDriveDuration(_ppDrive, targetDriveFac, targetSec));
 		chooser.addOption(
 				"TurnDuration (" + targetSec + "s, " + targetDps * targetSec
 						+ "deg)",
-				new RawTurnDuration(_diffDrive, targetTurnFac, targetSec));
+				new RawTurnDuration(_ppDrive, targetTurnFac, targetSec));
 
 		SmartDashboard.putData("Auto Mode Commands", chooser);
 		return chooser;
@@ -183,9 +204,9 @@ public class RobotContainer {
 		return chooser;
 	}
 
-	private final DiffDriveSubsystem _diffDrive;
+	private final PPDrivable _ppDrive;
 	private final SysIdDrivable _sysidDrive;
 	private final SendableChooser<Command> _autoChooser;
 	private final SendableChooser<Command> _testChooser;
-	private final XboxController _stick;
+	private final CommandXboxController _xbox;
 }

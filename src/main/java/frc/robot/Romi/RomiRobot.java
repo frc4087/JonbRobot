@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.Romi;
+package frc.robot.romi;
 
 import edu.wpi.first.wpilibj.romi.OnBoardIO;
 import edu.wpi.first.wpilibj.romi.OnBoardIO.ChannelMode;
@@ -12,14 +12,14 @@ import frc.jonb.subsystems.DiffDrivable;
 import frc.jonb.sysid.SysIdDrivable;
 
 /**
- * Robot configuration and logic specific to Romi.
+ * A robot based on the Romi framework, with drivetraoin and peripheral
+ * subsystem delegates.
  */
 public class RomiRobot {
 	/**
 	 * Creates an instance.
 	 */
 	public RomiRobot() {
-		// build drivetrain
 		_rawDrive = new RomiDriveSubsystem();
 		_onboardIO = new OnBoardIO(ChannelMode.INPUT, ChannelMode.INPUT);
 		configButtons();
